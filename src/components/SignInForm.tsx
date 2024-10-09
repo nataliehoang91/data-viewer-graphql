@@ -8,7 +8,7 @@ const SignInForm = () => {
 		<>
 			<FormControl>
 				<FormLabel>Username</FormLabel>
-				<Input name="username" type="text" placeholder="Username" required />
+				<Input name="userName" type="text" placeholder="Username" required />
 			</FormControl>
 			<FormControl>
 				<FormLabel>Job Title</FormLabel>

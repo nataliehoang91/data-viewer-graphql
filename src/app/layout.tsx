@@ -9,7 +9,7 @@ const RootLayout = async ({
 }: {
 	children: React.ReactNode;
 }) => {
-	const userName = await getServerCookie("username");
+	const userName = await getServerCookie("userName");
 	const jobTitle = await getServerCookie("jobTitle");
 	console.log("userName", userName);
 	console.log("jobTitle", jobTitle);

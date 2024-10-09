@@ -14,10 +14,13 @@ import {
 
 import UpdateInfoModal from "./UpdateInfoModal";
 
-const Navbar = ({ isSignedIn, username, jobTitle }) => {
-	const { isOpen, onOpen, onClose } = useDisclosure();
-	const toast = useToast();
+type NavbarProps = {
+	isSignedIn: boolean;
+	username: string;
+	jobTitle: string;
+};
 
+const Navbar = ({ isSignedIn, username, jobTitle }: NavbarProps) => {
 	const signOut = () => {
 		deleteServerCookie("username");
 		deleteServerCookie("jobTitle");
@@ -32,10 +35,11 @@ const Navbar = ({ isSignedIn, username, jobTitle }) => {
 					<HStack spacing={4}>
 						{isSignedIn ? (
 							<>
-								<Box>
-									{username} - {jobTitle}
-								</Box>
-								{isSignedIn && <UpdateInfoModal />}
+								<Link href="/profile">
+									<Box cursor="pointer">
+										{username} - {jobTitle}
+									</Box>
+								</Link>
 								<Button onClick={signOut}>Log Out</Button>
 							</>
 						) : (
