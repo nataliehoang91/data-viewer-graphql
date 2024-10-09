@@ -45,6 +45,7 @@ const InformationOverviewModal = ({
 	});
 
 	const anime = data?.Media;
+	console.log("hhh", anime?.siteUrl);
 
 	return (
 		<CustomDrawer
@@ -78,13 +79,11 @@ const InformationOverviewModal = ({
 								/>
 							</AspectRatio>
 							<VStack align="stretch" spacing={3}>
-								<Link href={anime?.siteUrl || "#"} passHref>
-									<ChakraLink isExternal color="blue.500">
-										<Text fontWeight="bold">
-											English Title: {anime?.title.english}
-										</Text>
-									</ChakraLink>
-								</Link>
+								<Text fontWeight="bold">{anime?.title.english}</Text>
+								<ChakraLink color="teal.500" href={anime.siteUrl} isExternal>
+									View more details
+								</ChakraLink>
+
 								<HStack>
 									<Text fontWeight="bold">Genres:</Text>
 									<HStack spacing={2} flexWrap="wrap">
