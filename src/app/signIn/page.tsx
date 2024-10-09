@@ -1,7 +1,7 @@
 import SubmitButton from "@/components/SubmitButton";
 import UserInfoForm from "@/components/UserInfoForm";
 import { setServerCookie } from "@/utils/cookiesActions";
-import { Box, Container, Text, VStack } from "@chakra-ui/react";
+import { Box, Container, Heading, VStack, useToast } from "@chakra-ui/react";
 import { redirect } from "next/navigation";
 
 const SignIn = () => {
@@ -16,24 +16,29 @@ const SignIn = () => {
 			setServerCookie("jobTitle", jobTitle);
 			redirect("/");
 		} else {
-			// do sth
+			redirect("/signIn?error=true");
 		}
 	};
 
 	return (
-		<Container centerContent>
-			<VStack spacing={4}>
-				<Text fontSize="2xl" fontWeight="bold">
-					Sign In
-				</Text>
-				<Box p={6} shadow="md" borderWidth="1px" width="md" borderRadius="md">
+		<Container maxW="md" py={12}>
+			<VStack spacing={8} align="stretch">
+				<Heading as="h1" size="xl" textAlign="center">
+					Welcome Back
+				</Heading>
+				<Box p={4} boxShadow="lg" borderRadius="lg" w="100%">
 					<form action={handleSignIn}>
-						<UserInfoForm />
-						<SubmitButton type="submit">Sign In</SubmitButton>
+						<VStack spacing={6}>
+							<UserInfoForm />
+							<SubmitButton type="submit" width="full">
+								Sign In
+							</SubmitButton>
+						</VStack>
 					</form>
 				</Box>
 			</VStack>
 		</Container>
 	);
 };
+
 export default SignIn;

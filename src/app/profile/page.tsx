@@ -1,18 +1,15 @@
 import SubmitButton from "@/components/SubmitButton";
-import UpdateInfoForm from "@/components/UserInfoForm";
+import UserInfoForm from "@/components/UserInfoForm";
 import { getServerCookie, setServerCookie } from "@/utils/cookiesActions";
 import {
 	Box,
-	Button,
 	Container,
-	FormControl,
-	FormLabel,
-	Input,
+	Heading,
+	Text,
 	VStack,
 	useToast,
 } from "@chakra-ui/react";
 import { redirect } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const Profile = async () => {
 	const userName = await getServerCookie("userName");
@@ -25,26 +22,38 @@ const Profile = async () => {
 	const handleUpdate = async (formData: FormData) => {
 		"use server";
 
-		const userName = formData.get("userName") as string;
-		const jobTitle = formData.get("jobTitle") as string;
-		console.log(userName, jobTitle);
-		if (userName) {
-			setServerCookie("username", userName);
-			setServerCookie("jobTitle", jobTitle);
-			redirect("/");
+		const newUserName = formData.get("userName") as string;
+		const newJobTitle = formData.get("jobTitle") as string;
+
+		if (newUserName) {
+			setServerCookie("userName", newUserName);
+			setServerCookie("jobTitle", newJobTitle);
+			redirect("/profile?updated=true");
 		} else {
-			// do sth
+			redirect("/profile?error=true");
 		}
 	};
 
 	return (
-		<Container centerContent>
-			<VStack spacing={4}>
-				<Box p={6} shadow="md" borderWidth="1px" width="md" borderRadius="md">
-					<form action={handleUpdate}>
-						<UpdateInfoForm userName={userName} jobTitle={jobTitle} />
-						<SubmitButton>Update</SubmitButton>
-					</form>
+		<Container maxW="md" py={12}>
+			<VStack spacing={8} align="stretch">
+				<Heading as="h1" size="xl" textAlign="center">
+					Your Profile
+				</Heading>
+				<Box p={8} boxShadow="lg" borderRadius="lg">
+					<VStack spacing={6}>
+						<Text fontSize="lg" fontWeight="medium">
+							Welcome back, {userName}!
+						</Text>
+						<form action={handleUpdate} style={{ width: "100%" }}>
+							<VStack spacing={6}>
+								<UserInfoForm userName={userName} jobTitle={jobTitle} />
+								<SubmitButton type="submit" width="full">
+									Update Profile
+								</SubmitButton>
+							</VStack>
+						</form>
+					</VStack>
 				</Box>
 			</VStack>
 		</Container>

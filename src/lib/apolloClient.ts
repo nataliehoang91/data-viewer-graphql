@@ -7,4 +7,9 @@ import {
 export const client = new ApolloClient<NormalizedCacheObject>({
 	uri: "https://graphql.anilist.co",
 	cache: new InMemoryCache(),
+	defaultOptions: {
+		query: {
+			fetchPolicy: "cache-first",
+		},
+	},
 });
