@@ -1,17 +1,8 @@
+import type { AnimeData } from "@/types";
 import { Badge, Box, HStack, Image, Text, VStack } from "@chakra-ui/react";
 
 type AnimeCardProps = {
-	anime: {
-		id: number;
-		title: {
-			romaji: string;
-		};
-		coverImage: {
-			large: string;
-		};
-		genres: string[];
-		averageScore: number;
-	};
+	anime: AnimeData;
 	onClick: () => void;
 	isSelected: boolean;
 };

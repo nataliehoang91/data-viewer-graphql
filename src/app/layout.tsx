@@ -11,8 +11,8 @@ const RootLayout = async ({
 }) => {
 	const userName = await getServerCookie("userName");
 	const jobTitle = await getServerCookie("jobTitle");
-	console.log("userName", userName);
-	console.log("jobTitle", jobTitle);
+
+	const isSignedIn = userName && jobTitle;
 
 	return (
 		<html lang="en">
@@ -20,7 +20,7 @@ const RootLayout = async ({
 				<ApolloProviderWrapper>
 					<ChakraProviderWrapper>
 						<Navbar
-							isSignedIn={userName && jobTitle}
+							isSignedIn={!!isSignedIn}
 							username={userName}
 							jobTitle={jobTitle}
 						/>

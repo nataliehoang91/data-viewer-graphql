@@ -88,8 +88,8 @@ const InformationOverviewModal = ({
 								<HStack>
 									<Text fontWeight="bold">Genres:</Text>
 									<HStack spacing={2} flexWrap="wrap">
-										{anime?.genres.map((genre, index) => (
-											<Badge key={index} colorScheme="teal" borderRadius="full">
+										{anime?.genres.map((genre: string, index: number) => (
+											<Badge key={genre} colorScheme="teal" borderRadius="full">
 												{genre}
 											</Badge>
 										))}
@@ -100,6 +100,7 @@ const InformationOverviewModal = ({
 								</Text>
 								<Text fontWeight="bold">Description:</Text>
 								<Box
+									// biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
 									dangerouslySetInnerHTML={{ __html: anime?.description || "" }}
 									sx={{
 										p: {
