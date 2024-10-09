@@ -1,5 +1,8 @@
 "use client";
 
+import AnimeCard from "@/components/AnimeCard";
+import SkeletonCard from "@/components/SkeletonCard";
+import { getServerCookie as getCookie } from "@/utils/cookiesActions";
 import { gql, useQuery } from "@apollo/client";
 import {
 	Box,
@@ -7,6 +10,7 @@ import {
 	Container,
 	HStack,
 	Image,
+	Link,
 	Modal,
 	ModalBody,
 	ModalCloseButton,
@@ -18,9 +22,10 @@ import {
 	Text,
 	VStack,
 	useDisclosure,
+	useToast,
 } from "@chakra-ui/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const GET_ANIME = gql`
   query ($page: Int, $perPage: Int) {
@@ -44,6 +49,7 @@ const GET_ANIME = gql`
         description
         genres
         averageScore
+        siteUrl
       }
     }
   }
@@ -51,15 +57,38 @@ const GET_ANIME = gql`
 
 const ITEMS_PER_PAGE = 12;
 
-export default function InformationPage() {
+const InformationPage = () => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const page = Number(searchParams.get("page")) || 1;
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [selectedAnime, setSelectedAnime] = useState(null);
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const toast = useToast();
+
+	useEffect(() => {
+		const checkAuth = async () => {
+			const userName = await getCookie("userName");
+			const jobTitle = await getCookie("jobTitle");
+			if (!userName || !jobTitle) {
+				toast({
+					title: "Authentication required",
+					description: "Please sign in to view this page.",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+				});
+				router.push("/");
+			} else {
+				setIsAuthenticated(true);
+			}
+		};
+		checkAuth();
+	}, [router, toast]);
 
 	const { loading, error, data } = useQuery(GET_ANIME, {
 		variables: { page, perPage: ITEMS_PER_PAGE },
+		skip: !isAuthenticated,
 	});
 
 	const handlePageChange = (newPage: number) => {
@@ -71,10 +100,13 @@ export default function InformationPage() {
 		onOpen();
 	};
 
-	if (loading) return <Text>Loading...</Text>;
+	if (!isAuthenticated) {
+		return null;
+	}
+
 	if (error) return <Text>Error: {error.message}</Text>;
 
-	const { media, pageInfo } = data.Page;
+	const { media = [], pageInfo = {} } = data?.Page || {};
 
 	return (
 		<Container maxW="container.xl" py={10}>
@@ -82,37 +114,35 @@ export default function InformationPage() {
 				<Text fontSize="2xl" fontWeight="bold">
 					Popular Anime
 				</Text>
-				<SimpleGrid columns={[1, 2, 3, 4]} spacing={6}>
-					{media.map((anime) => (
-						<Box
-							key={anime.id}
-							borderWidth="1px"
-							borderRadius="lg"
-							overflow="hidden"
-							onClick={() => openAnimeModal(anime)}
-							cursor="pointer"
-						>
-							<Image src={anime.coverImage.large} alt={anime.title.romaji} />
-							<Box p="6">
-								<Text fontWeight="bold">{anime.title.romaji}</Text>
-								<Text fontSize="sm">{anime.genres.join(", ")}</Text>
-							</Box>
-						</Box>
-					))}
+				<SimpleGrid columns={[1, 2, 3, 4]} spacing={6} w="100%">
+					{loading
+						? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+								<SkeletonCard key={index} />
+							))
+						: media.map((anime) => {
+								console.log("anime", anime);
+								return (
+									<AnimeCard
+										key={anime.id}
+										anime={anime}
+										onClick={() => openAnimeModal(anime)}
+									/>
+								);
+							})}
 				</SimpleGrid>
 				<HStack>
 					<Button
 						onClick={() => handlePageChange(page - 1)}
-						isDisabled={page === 1}
+						isDisabled={page === 1 || loading}
 					>
 						Previous
 					</Button>
 					<Text>
-						Page {pageInfo.currentPage} of {pageInfo.lastPage}
+						Page {pageInfo.currentPage || page} of {pageInfo.lastPage || "..."}
 					</Text>
 					<Button
 						onClick={() => handlePageChange(page + 1)}
-						isDisabled={!pageInfo.hasNextPage}
+						isDisabled={!pageInfo.hasNextPage || loading}
 					>
 						Next
 					</Button>
@@ -130,9 +160,15 @@ export default function InformationPage() {
 							alt={selectedAnime?.title.romaji}
 							mb={4}
 						/>
-						<Text mb={2}>
-							<strong>English Title:</strong> {selectedAnime?.title.english}
-						</Text>
+						<Link
+							href={selectedAnime?.siteUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							<Text mb={2}>
+								<strong>English Title:</strong> {selectedAnime?.title.english}
+							</Text>
+						</Link>
 						<Text mb={2}>
 							<strong>Genres:</strong> {selectedAnime?.genres.join(", ")}
 						</Text>
@@ -155,4 +191,5 @@ export default function InformationPage() {
 			</Modal>
 		</Container>
 	);
-}
+};
+export default InformationPage;
