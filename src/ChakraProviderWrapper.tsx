@@ -1,14 +1,16 @@
 "use client";
 
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 
 const config = {
-	initialColorMode: "system",
-	useSystemColorMode: true,
+	initialColorMode: "light",
+	useSystemColorMode: false,
 };
 
-const ChakraWrapper = ({ children }: { children: React.ReactNode }) => {
-	return <ChakraProvider>{children}</ChakraProvider>;
+const theme = extendTheme({ config });
+
+const ChakraProviderWrapper = ({ children }: { children: React.ReactNode }) => {
+	return <ChakraProvider theme={theme}>{children}</ChakraProvider>;
 };
 
-export default ChakraWrapper;
+export default ChakraProviderWrapper;
